@@ -1,16 +1,20 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import { DisplayMode, Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneTextField
+  PropertyPaneTextField,
+  // PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
-
+import { PropertyFieldNumber } from '@pnp/spfx-property-controls/lib/PropertyFieldNumber';
 import * as strings from 'BannerWebPartStrings';
 import Banner from './components/Banner';
 import { IBannerProps } from './components/IBannerProps';
+import { spfi, SPFI, SPFx } from '@pnp/sp';
+import "@pnp/sp/webs";
+import "@pnp/sp/lists";
+import "@pnp/sp/items";
 
 export interface IBannerWebPartProps {
   description: string;
@@ -27,13 +31,20 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
 
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
+  private _sp: SPFI = null;
+  
 
   public render(): void {
     const element: React.ReactElement<IBannerProps> = React.createElement(
       Banner,
       {
+        ...this.properties,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
+        sp: this._sp,
+        propertyPane: this.context.propertyPane,
+        domElement: this.context.domElement,
+        useParallaxInt: this.displayMode === DisplayMode.Read && !!this.properties.bannerImage && this.properties.useParallax
       }
     );
 
@@ -43,10 +54,22 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
   protected onInit(): Promise<void> {
     return this._getEnvironmentMessage().then(message => {
       this._environmentMessage = message;
+      this._sp = spfi().using(SPFx(this.context));
     });
   }
 
-
+  private _validateImageField(imgVal: string): string {
+    if (imgVal) {
+      const urlSplit = imgVal.split(".");
+      if (urlSplit && urlSplit.length > 0) {
+        const extName = urlSplit.pop().toLowerCase();
+        if (["jpg", "jpeg", "png", "gif"].indexOf(extName) === -1) {
+          return "Please provide a link to an image";
+        }
+      }
+    }
+    return "";
+  }
 
   private _getEnvironmentMessage(): Promise<string> {
     if (!!this.context.sdks.microsoftTeams) { // running in Teams, office.com or Outlook
@@ -68,24 +91,6 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
     return Promise.resolve(this.context.isServedFromLocalhost ? strings.AppLocalEnvironmentSharePoint : strings.AppSharePointEnvironment);
   }
 
-  protected onThemeChanged(currentTheme: IReadonlyTheme | undefined): void {
-    if (!currentTheme) {
-      return;
-    }
-
-    this._isDarkTheme = !!currentTheme.isInverted;
-    const {
-      semanticColors
-    } = currentTheme;
-
-    if (semanticColors) {
-      this.domElement.style.setProperty('--bodyText', semanticColors.bodyText || null);
-      this.domElement.style.setProperty('--link', semanticColors.link || null);
-      this.domElement.style.setProperty('--linkHovered', semanticColors.linkHovered || null);
-    }
-
-  }
-
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
@@ -105,9 +110,32 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
-                })
+                PropertyPaneTextField('bannerText', {
+                  label: "Overlay image text",
+                  multiline: true,
+                  maxLength: 200,
+                  value: this.properties.bannerText
+                }),
+                PropertyPaneTextField('bannerImage', {
+                  label: "Image URL",
+                  onGetErrorMessage: this._validateImageField,
+                  value: this.properties.bannerImage
+                }),
+                // PropertyPaneTextField('bannerLink', {
+                //   label: "Link URL",
+                //   value: this.properties.bannerLink
+                // }),
+                PropertyFieldNumber('bannerHeight', {
+                  key: "bannerHeight",
+                  label: "Banner height",
+                  value: this.properties.bannerHeight,
+                  maxValue: 500,
+                  minValue: 400
+                }),
+                // PropertyPaneToggle('useParallax', {
+                //   label: "Enable parallax effect",
+                //   checked: this.properties.useParallax
+                // })
               ]
             }
           ]
