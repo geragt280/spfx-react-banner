@@ -19,8 +19,12 @@
       "bannerText": "",
       "bannerImage": "",
       "bannerLink": "",
-      "bannerHeight": 400,
-      "useParallax": true
+      "bannerHeight": 420,
+      "useParallax": true,
+      "headingFontSize": 12,
+      "textFontSize": 9,
+      "cardOpacity": 0.8,
+      "allNewLink": "#"
     }
   }]
 }

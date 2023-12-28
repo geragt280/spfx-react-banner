@@ -12,4 +12,8 @@ export interface IBannerProps {
   bannerImage: string;
   bannerLink: string;
   bannerHeight: number;
+  headerFontSize: number;
+  textFontSize: number;
+  cardOpacity: number;
+  allViewNewsLink: string;
 }

@@ -14,7 +14,12 @@ import {
 } from "office-ui-fabric-react/lib/DocumentCard";
 import { ImageFit } from "office-ui-fabric-react/lib/Image";
 import "./card.css";
-import { Stack, IStackTokens, IStackProps } from 'office-ui-fabric-react';
+import {
+  // Stack, IStackTokens,
+  IStackProps,
+  css,
+  // Text,
+} from "office-ui-fabric-react";
 
 interface IBannerStates {
   NewsItems: any[];
@@ -27,10 +32,9 @@ export default class Banner extends React.Component<
   private _scrollElm: HTMLElement = null;
   private _scrollElmRect: ClientRect = null;
   private _parallaxElm: HTMLElement = null;
-  private horizontalAlignment: IStackProps['horizontalAlign'];
-  private verticalAlignment: IStackProps['verticalAlign'];
-  private wrapStackTokens: IStackTokens = { childrenGap: 20 };
-  
+  private horizontalAlignment: IStackProps["horizontalAlign"];
+  private verticalAlignment: IStackProps["verticalAlign"];
+  // private wrapStackTokens: IStackTokens = { childrenGap: 20 };
 
   // private stackStyles: IStackStyles = {
   //   root: {
@@ -95,9 +99,8 @@ export default class Banner extends React.Component<
       )
       .filter("PromotedState eq '2'")();
 
-    
     this.setState({
-      NewsItems: newsItems.slice(-3),
+      NewsItems: newsItems.slice(-4),
     });
     console.log("All news", newsItems);
   }
@@ -110,15 +113,15 @@ export default class Banner extends React.Component<
 
     // Ensure two-digit day and month
     if (day.length === 1) {
-        day = '0' + day;
+      day = "0" + day;
     }
 
     if (month.length === 1) {
-        month = '0' + month;
+      month = "0" + month;
     }
 
     return `${day}/${month}/${year}`;
-}
+  }
 
   private _onConfigure = () => {
     this.props.propertyPane.open();
@@ -180,7 +183,11 @@ export default class Banner extends React.Component<
   }
 
   public componentDidMount(): void {
-    console.log("Alignment got", this.verticalAlignment, this.horizontalAlignment);
+    console.log(
+      "Alignment got",
+      this.verticalAlignment,
+      this.horizontalAlignment
+    );
     this._parallaxBinding();
   }
 
@@ -192,86 +199,197 @@ export default class Banner extends React.Component<
     this._removeParallaxBinding();
   }
 
-  private _onRenderGridItem = (
-    item: any,
-    index: number
-  ): JSX.Element => {
-
-    if (index === 2) {
+  private _onRenderGridItem = (item: any, index: number): JSX.Element => {
+    const { headerFontSize, textFontSize, allViewNewsLink, cardOpacity } = this.props;
+    console.error("debug");
+    const truncatedString =
+      item.Description?.length > 100
+        ? item.Description.slice(0, 100) + "..."
+        : item.Description;
+    if (index === 1 || index === 3) {
       return (
-        <div data-is-focusable={true} role="listitem" aria-label={item.title}>
+        <div
+          className={styles.msGridcol}
+          data-is-focusable={true}
+          role="listitem"
+          aria-label={item.title}
+        >
           <DocumentCard
-            styles={{root:{padding:10, height:140}}}
+            styles={{
+              root: {
+                padding: 10,
+                // height: 140
+                maxWidth: "100%",
+                backgroundColor: `rgba(255, 255, 255, ${cardOpacity ? cardOpacity : 0.8})`
+              },
+            }}
             className={styles.singleItemsBackGround}
             aria-label="Document Card with document preview. Revenue stream proposal fiscal year 2016 version 2.
           Created by Roko Kolar a few minutes ago"
             type={DocumentCardType.compact}
-            onClickHref={window.location.origin + item.FileRef} onClickTarget={"_blank"}
+            onClickHref={window.location.origin + item.FileRef}
+            onClickTarget={"tab"}
           >
-            { item.BannerImageUrl && item.BannerImageUrl.Url && <DocumentCardPreview previewImages={
-              [
-                {
-                  previewImageSrc: item.BannerImageUrl.Url,
-                  imageFit: ImageFit.cover,
-                  height: 130,
-                  width: 130
+            <DocumentCardDetails
+              styles={{
+                root: {
+                  minWidth: 340,
+                  justifyContent: "flex-start",
                 },
-              ]
-            } /> }
-            <DocumentCardDetails styles={{root:{
-              minWidth:340,
-              justifyContent:'flex-start'
-            }}}>
-              <DocumentCardTitle title={item.Title} styles={{root:{height:15}}} className={styles.singleItemsDate} />
-              <DocumentCardTitle title={item.Description}
-               className={styles.singleItemsDescription} styles={{root:{height:100}}} showAsSecondaryTitle />
-              </DocumentCardDetails>                     
-          </DocumentCard>
-          
-        </div>
-      );
-    }else{
-      return (
-        <div data-is-focusable={true} role="listitem" aria-label={item.title}>
-          <DocumentCard
-            styles={{root:{padding:10}}}
-            className={styles.singleItemsBackGround}
-            aria-label="Document Card with document preview. Revenue stream proposal fiscal year 2016 version 2.
-          Created by Roko Kolar a few minutes ago"
-            type={DocumentCardType.compact}
-            onClickHref={window.location.origin + item.FileRef} onClickTarget={"_blank"}
-          >
-            <DocumentCardDetails styles={{root:{
-              minWidth:340,
-              justifyContent:'flex-start'
-            }}}>
-              <DocumentCardTitle title={this.formatDate(item.Created)} styles={{root:{height:15}}} className={styles.singleItemsDate} />
-              <DocumentCardTitle title={item.Description}
-               className={styles.singleItemsDescription} showAsSecondaryTitle />
-               { item.Description && item.Description.length > 100 && <DocumentCardTitle title={"See more"} className={styles.singleItemsSeeMore} showAsSecondaryTitle />}
-              </DocumentCardDetails>  
-              { item.BannerImageUrl && item.BannerImageUrl.Url && <DocumentCardPreview previewImages={
-                [
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <DocumentCardTitle
+                  title={item.Title}
+                  styles={{
+                    root: { height: 15, fontSize: `${headerFontSize}px !Important` },
+                  }}
+                  className={styles.singleItemsDate}
+                />
+                <DocumentCardTitle
+                  title={this.formatDate(item.Created)}
+                  styles={{
+                    root: { height: 15, fontSize: `${headerFontSize}px !important` },
+                  }}
+                  className={styles.singleItemsDate}
+                />
+              </div>
+              <DocumentCardTitle
+                title={truncatedString}
+                className={styles.singleItemsDescription}
+                styles={{
+                  root: { height: 100, fontSize: `${textFontSize}px !important` },
+                }}
+                showAsSecondaryTitle
+              />
+              {item.Description && item.Description.length > 100 && (
+                <DocumentCardTitle
+                  title={"See more"}
+                  className={styles.singleItemsSeeMore}
+                  showAsSecondaryTitle
+                />
+              )}
+            </DocumentCardDetails>
+            {item.BannerImageUrl && item.BannerImageUrl.Url && (
+              <DocumentCardPreview
+                previewImages={[
                   {
                     previewImageSrc: item.BannerImageUrl.Url,
                     imageFit: ImageFit.cover,
                     height: 130,
-                    width: 130
+                    width: 130,
                   },
-                ]
-              } /> }       
+                ]}
+              />
+            )}
           </DocumentCard>
-          
+          <div
+            style={{
+              height: index === 3 ? 10 : 5,
+              fontSize: index === 3 ? 10 : 0,
+              padding: index === 3 ? 5 : 0,
+              backgroundColor: "#000",
+              
+            }}
+          >
+            {index === 3 ? <a href={allViewNewsLink} style={{cursor: 'pointer'}} target={"_blank"} >View All News</a> : ""}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div
+          className={styles.msGridcol}
+          data-is-focusable={true}
+          role="listitem"
+          aria-label={item.title}
+        >
+          <DocumentCard
+            styles={{ root: { 
+              padding: 10, 
+              maxWidth: "100%",
+              backgroundColor: `rgba(255, 255, 255, ${cardOpacity ? cardOpacity : 0.8})` 
+            }}}
+            className={styles.singleItemsBackGround}
+            aria-label="Document Card with document preview. Revenue stream proposal fiscal year 2016 version 2.
+          Created by Roko Kolar a few minutes ago"
+            type={DocumentCardType.compact}
+            onClickHref={window.location.origin + item.FileRef}
+            onClickTarget={"tab"}
+          >
+            <DocumentCardDetails
+              styles={{
+                root: {
+                  minWidth: 340,
+                  justifyContent: "flex-start",
+                },
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <DocumentCardTitle
+                  title={item.Title}
+                  styles={{
+                    root: { height: 15, fontSize: `${headerFontSize}px !important` },
+                  }}
+                  className={styles.singleItemsDate}
+                />
+                <DocumentCardTitle
+                  title={this.formatDate(item.Created)}
+                  styles={{
+                    root: { height: 15, fontSize: `${headerFontSize}px !important` },
+                  }}
+                  className={styles.singleItemsDate}
+                />
+              </div>
+              <DocumentCardTitle
+                title={truncatedString}
+                className={styles.singleItemsDescription}
+                styles={{ root: { fontSize: `${textFontSize}px !important` } }}
+                showAsSecondaryTitle
+              />
+              {item.Description && item.Description.length > 100 && (
+                <DocumentCardTitle
+                  title={"See more"}
+                  className={styles.singleItemsSeeMore}
+                  showAsSecondaryTitle
+                />
+              )}
+            </DocumentCardDetails>
+            {item.BannerImageUrl && item.BannerImageUrl.Url && (
+              <DocumentCardPreview
+                previewImages={[
+                  {
+                    previewImageSrc: item.BannerImageUrl.Url,
+                    imageFit: ImageFit.cover,
+                    height: 130,
+                    width: 130,
+                  },
+                ]}
+              />
+            )}
+          </DocumentCard>
+          <div style={{ height: 5, backgroundColor: "#000" }}></div>
         </div>
       );
     }
-
-
-    
   };
 
   public render(): React.ReactElement<IBannerProps> {
-    const {bannerImage, bannerHeight, bannerLink, bannerText} = this.props;
+    const { bannerImage, bannerHeight, bannerLink, bannerText } = this.props;
     const { NewsItems } = this.state;
 
     if (this.props.bannerImage) {
@@ -279,9 +397,7 @@ export default class Banner extends React.Component<
         <div
           className={styles.banner}
           style={{
-            height: bannerHeight
-              ? `${bannerHeight}px`
-              : `280px`,
+            height: bannerHeight ? `${bannerHeight}px` : `400px`,
           }}
         >
           <div
@@ -291,30 +407,23 @@ export default class Banner extends React.Component<
             }}
           ></div>
           <div className={styles.bannerOverlay}></div>
-          <div className={styles.bannerText}>
+          <div className={css(styles.bannerText, styles.msGrid)}>
             {bannerLink ? (
-              <a
-                href={bannerLink}
-                title={escape(bannerText)}
-              >
+              <a href={bannerLink} title={escape(bannerText)}>
                 {escape(bannerText)}
               </a>
             ) : (
               <span>{bannerText}</span>
             )}
-            <div className="bbg"  style={{height:290}}>
-            <Stack 
-              tokens={this.wrapStackTokens} 
-              wrap
-              verticalAlign="end"
-              horizontalAlign="start"
+            <div
+              className={css("bbg", styles.msGridrow)}
+              // style={{ height: 320 }}
             >
-              {
-                NewsItems.map((item, index) => {
-                  return this._onRenderGridItem(item, index)
-                })
-              }
-            </Stack>
+              <div>
+                {NewsItems.map((item, index) => {
+                  return this._onRenderGridItem(item, index);
+                })}
+              </div>
             </div>
           </div>
         </div>

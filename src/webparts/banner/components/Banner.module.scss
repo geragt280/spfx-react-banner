@@ -9,10 +9,28 @@
   overflow: hidden;
 
   .singleItemsBackGround {
-    background-color: rgba(255, 255, 255, 0.8);
+    // background-color: rgba(255, 255, 255, 0.8);
     border-top-width: thick;
     border-top-color: #BE9B61;
     border-top-style: solid;
+  }
+
+  .msGrid{
+    @include ms-Grid;
+  }
+
+  .msGridrow{
+    @include ms-Grid-row;
+  }
+
+  .msGridcol{
+    @include ms-Grid-col;
+    @include ms-sm12;
+    @include ms-md12;
+    @include ms-lg12;
+    @include ms-xl6;
+    @include ms-xxl6;
+    padding: 5px 15px 5px 15px;
   }
 
   .singleItemsDate{

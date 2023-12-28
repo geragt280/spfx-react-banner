@@ -25,6 +25,10 @@ export interface IBannerWebPartProps {
   fullWidth: boolean;
   useParallax: boolean;
   useParallaxInt: boolean;
+  headingFontSize:number;
+  textFontSize: number;
+  cardOpacity: number;
+  allNewLink: string;
 }
 
 export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartProps> {
@@ -44,7 +48,11 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
         sp: this._sp,
         propertyPane: this.context.propertyPane,
         domElement: this.context.domElement,
-        useParallaxInt: this.displayMode === DisplayMode.Read && !!this.properties.bannerImage && this.properties.useParallax
+        useParallaxInt: this.displayMode === DisplayMode.Read && !!this.properties.bannerImage && this.properties.useParallax,
+        headerFontSize: this.properties.headingFontSize,
+        textFontSize: this.properties.textFontSize,
+        cardOpacity: this.properties.cardOpacity,
+        allViewNewsLink: this.properties.allNewLink
       }
     );
 
@@ -111,15 +119,16 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
               groupName: strings.BasicGroupName,
               groupFields: [
                 PropertyPaneTextField('bannerText', {
-                  label: "Overlay image text",
+                  label: "Overlay image text (Optional)",
+                  placeholder:'leave blank for no heading',
                   multiline: true,
                   maxLength: 200,
                   value: this.properties.bannerText
                 }),
                 PropertyPaneTextField('bannerImage', {
-                  label: "Image URL",
+                  label: "Image URL *",
                   onGetErrorMessage: this._validateImageField,
-                  value: this.properties.bannerImage
+                  value: this.properties.bannerImage,
                 }),
                 // PropertyPaneTextField('bannerLink', {
                 //   label: "Link URL",
@@ -128,10 +137,42 @@ export default class BannerWebPart extends BaseClientSideWebPart<IBannerWebPartP
                 PropertyFieldNumber('bannerHeight', {
                   key: "bannerHeight",
                   label: "Banner height",
+                  placeholder: "(420 - 520)",
                   value: this.properties.bannerHeight,
-                  maxValue: 500,
-                  minValue: 400
+                  maxValue: 520,
+                  minValue: 420
                 }),
+                PropertyFieldNumber('headingFontSize', {
+                  key: "headingFontSize",
+                  label: "Heading font size",
+                  placeholder: "(10 - 16)",
+                  value: this.properties.headingFontSize,
+                  maxValue: 16,
+                  minValue: 10
+                }),
+                PropertyFieldNumber('textFontSize', {
+                  key: "textFontSize",
+                  label: "Text font size",
+                  placeholder: "(9 - 15)",
+                  value: this.properties.textFontSize,
+                  maxValue: 15,
+                  minValue: 9
+                }),
+                PropertyFieldNumber('cardOpacity', {
+                  key: "cardOpacity",
+                  label: "Card Opacity",
+                  placeholder: "(0.1 - 1)",
+                  value: this.properties.cardOpacity,
+                  maxValue: 1,
+                  minValue: 0
+                }),
+                PropertyPaneTextField('allNewLink', {
+                  label: "Provide view all news link",
+                  placeholder:'like (https://www.google.com)',
+                  multiline: true,
+                  maxLength: 200,
+                  value: this.properties.allNewLink
+                })
                 // PropertyPaneToggle('useParallax', {
                 //   label: "Enable parallax effect",
                 //   checked: this.properties.useParallax
