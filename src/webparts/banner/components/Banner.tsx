@@ -203,8 +203,8 @@ export default class Banner extends React.Component<
     const { headerFontSize, textFontSize, allViewNewsLink, cardOpacity } = this.props;
     console.error("debug");
     const truncatedString =
-      item.Description?.length > 100
-        ? item.Description.slice(0, 100) + "..."
+      item.Description?.length > 200
+        ? item.Description.slice(0, 200) + "..."
         : item.Description;
     if (index === 1 || index === 3) {
       return (
@@ -249,7 +249,7 @@ export default class Banner extends React.Component<
                 <DocumentCardTitle
                   title={item.Title}
                   styles={{
-                    root: { height: 15, fontSize: `${headerFontSize}px !Important` },
+                    root: { height: 27, fontSize: `${headerFontSize}px !Important` },
                   }}
                   className={styles.singleItemsDate}
                 />
@@ -269,7 +269,7 @@ export default class Banner extends React.Component<
                 }}
                 showAsSecondaryTitle
               />
-              {item.Description && item.Description.length > 100 && (
+              {item.Description && item.Description.length > 200 && (
                 <DocumentCardTitle
                   title={"See more"}
                   className={styles.singleItemsSeeMore}
@@ -343,7 +343,7 @@ export default class Banner extends React.Component<
                 <DocumentCardTitle
                   title={item.Title}
                   styles={{
-                    root: { height: 15, fontSize: `${headerFontSize}px !important` },
+                    root: { height: 27, fontSize: `${headerFontSize}px !important` },
                   }}
                   className={styles.singleItemsDate}
                 />
@@ -361,7 +361,7 @@ export default class Banner extends React.Component<
                 styles={{ root: { fontSize: `${textFontSize}px !important` } }}
                 showAsSecondaryTitle
               />
-              {item.Description && item.Description.length > 100 && (
+              {item.Description && item.Description.length > 200 && (
                 <DocumentCardTitle
                   title={"See more"}
                   className={styles.singleItemsSeeMore}

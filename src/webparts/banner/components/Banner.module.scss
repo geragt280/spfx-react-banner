@@ -13,6 +13,7 @@
     border-top-width: thick;
     border-top-color: #BE9B61;
     border-top-style: solid;
+    height: 150px;
   }
 
   .msGrid{
@@ -35,10 +36,12 @@
 
   .singleItemsDate{
     color: #BE9B61;
+    display: flex;
+    align-items: center;
   }
 
   .singleItemsDescription{
-    font-size: small;
+    height: 60px;
   }
 
   .singleItemsSeeMore{
